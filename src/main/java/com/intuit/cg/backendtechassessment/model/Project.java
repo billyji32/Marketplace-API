@@ -1,23 +1,22 @@
 package com.intuit.cg.backendtechassessment.model;
 
+import com.intuit.cg.backendtechassessment.model.shared.DataType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 //Use queries instead of unidirectional entity relationships
 //Can use bidirectional entity relationships but bids -> projects
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "Projects")
-public class Project {
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-
-    @NotNull
+public class Project extends DataType {
+    @NotEmpty
     private String name;
 
     @NotNull

@@ -1,6 +1,8 @@
 package com.intuit.cg.backendtechassessment.model;
 
+import com.intuit.cg.backendtechassessment.model.shared.DataType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -9,10 +11,11 @@ import java.math.BigDecimal;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "Bids")
-public class Bid {
+public class Bid extends DataType {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

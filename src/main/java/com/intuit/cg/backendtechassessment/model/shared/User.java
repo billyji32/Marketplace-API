@@ -1,26 +1,21 @@
 package com.intuit.cg.backendtechassessment.model.shared;
 
-import lombok.Data;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @MappedSuperclass
-public abstract class User {
-    //Specify GenerationType.IDENTITY because default is GenerationType.AUTO which creates unique values across all entities
-    //rather than unique values per entity.
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotNull
+public abstract class User extends DataType {
+    @NotEmpty
     private String firstName;
 
-    @NotNull
+    @NotEmpty
     private String lastName;
 
-    @NotNull
+    @NotEmpty
     private String email;
 
     public void updateInfoWith(User user) {
