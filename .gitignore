@@ -39,6 +39,6 @@ Thumbs.db
 ## Miscellaneous files
 .gradle
 .idea
-.iml
+*.iml
 build
 target
