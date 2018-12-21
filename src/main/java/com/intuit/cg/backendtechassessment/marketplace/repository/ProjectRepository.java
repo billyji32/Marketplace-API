@@ -1,0 +1,10 @@
+package com.intuit.cg.backendtechassessment.marketplace.repository;
+
+import com.intuit.cg.backendtechassessment.marketplace.entity.Project;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ProjectRepository extends JpaRepository<Project, Long> {
+    List<Project> findBySellerId(Long sellerId);
+}
