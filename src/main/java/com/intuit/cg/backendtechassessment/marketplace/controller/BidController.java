@@ -18,7 +18,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @JsonRequestMappingTemplate(value = BIDS)
-public class BidController extends ResourceController {
+class BidController extends ResourceController {
 	private final BidRepository bidRepository;
 	private final BidResourceAssembler assembler;
 
@@ -38,7 +38,7 @@ public class BidController extends ResourceController {
 	}
 
 	@GetMapping("/{id}")
-	public Resource<Bid> getBid(@PathVariable Long id) {
+	Resource<Bid> getBid(@PathVariable Long id) {
 		Bid bid = bidRepository.findById(id)
 				.orElseThrow(ResourceNotFoundException::new);
 

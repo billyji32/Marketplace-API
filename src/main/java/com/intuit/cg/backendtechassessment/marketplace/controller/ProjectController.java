@@ -59,7 +59,7 @@ public class ProjectController extends ResourceController {
 	}
 
 	@GetMapping("/{id}")
-	public Resource<Project> getProject(@PathVariable Long id) {
+	Resource<Project> getProject(@PathVariable Long id) {
 		Project project = projectRepository.findById(id)
 				.orElseThrow(ResourceNotFoundException::new);
 
@@ -67,7 +67,7 @@ public class ProjectController extends ResourceController {
 	}
 
 	@GetMapping("/{id}/bids")
-	public List<Bid> getBids(@PathVariable Long id) {
+	List<Bid> getBids(@PathVariable Long id) {
 		if(resourceExists(projectRepository, id))
 			return bidRepository.findByProjectId(id);
 		else

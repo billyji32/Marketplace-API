@@ -56,7 +56,7 @@ public class BuyerController extends ResourceController {
 	}
 
 	@GetMapping("/{id}/bids")
-	public List<Bid> getBids(@PathVariable Long id) {
+	List<Bid> getBids(@PathVariable Long id) {
 		if(resourceExists(buyerRepository, id))
 			return bidRepository.findByBuyerId(id);
 		else

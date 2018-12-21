@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @RequestMapping(consumes = "application/json", produces = "application/json")
+@SuppressWarnings("unused")
 public @interface JsonRequestMappingTemplate {
     @AliasFor(annotation = RequestMapping.class, attribute = "value")
     String[] value() default {};

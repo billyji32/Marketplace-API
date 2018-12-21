@@ -14,6 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @org.springframework.context.annotation.Configuration
 @EnableSwagger2
 @ComponentScan(basePackages="com.intuit.cg.backendtechassessment.controller")
+@SuppressWarnings("unused")
 public class SwaggerConfiguration {
 	@Bean
 	public Docket customDocket(){
