@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.intuit.cg</groupId>
-	<artifactId>backend-tech-assessment-standard</artifactId>
+	<artifactId>marketplace-project</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>backend-tech-assessment-standard</name>
+	<name>marketplace-project</name>
 	<description>Demo project for Spring Boot</description>
 
 	<parent>
