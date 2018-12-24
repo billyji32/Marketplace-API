@@ -70,7 +70,7 @@ class SellerController extends ResourceController {
 	}
 
 	@PutMapping("/{id}")
-	ResponseEntity<Resource<Seller>> replaceSeller(@RequestBody Seller newSeller, @PathVariable Long id) throws URISyntaxException {
+	ResponseEntity<Resource<Seller>> updateOrCreateNewSeller(@RequestBody Seller newSeller, @PathVariable Long id) throws URISyntaxException {
 		Seller updatedSeller = sellerRepository.findById(id)
 				.map(oldSeller -> {
 					oldSeller.updateInfoWith(newSeller);

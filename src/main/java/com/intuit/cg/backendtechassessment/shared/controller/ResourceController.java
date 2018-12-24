@@ -3,7 +3,7 @@ package com.intuit.cg.backendtechassessment.shared.controller;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public abstract class ResourceController {
-    protected boolean resourceExists(JpaRepository repository, Long id) {
+    protected boolean resourceExists(JpaRepository<?, Long> repository, Long id) {
         return repository.findById(id).isPresent();
     }
 }

@@ -17,10 +17,6 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "Bids")
 public class Bid extends DataType {
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-
     @NotNull
     private Long buyerId;
 
@@ -31,4 +27,12 @@ public class Bid extends DataType {
 
     //This value gets set from the api ${id} value e.g. projects/${id}/bids since we post bids from the project root
     private Long projectId;
+
+    //The following variables are used for autobid implementation--maybe split out into its
+    //own entity?
+    private boolean autobid;
+    @Positive
+    private BigDecimal maxBidAmount;
+    @Positive
+    private BigDecimal bidAdditionalAmount;
 }

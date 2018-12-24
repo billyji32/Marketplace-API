@@ -27,6 +27,9 @@ class BidController extends ResourceController {
 		this.assembler = assembler;
 	}
 
+	//In reality I don't think this method is necessary or correct to include.
+	//Bids are by far the most frequent entity and frequently returning all of
+	//them can lead to performance issues
 	@GetMapping
 	Resources<Resource<Bid>> getBids() {
 		List<Resource<Bid>> bids = bidRepository.findAll().stream()
@@ -44,5 +47,4 @@ class BidController extends ResourceController {
 
 		return assembler.toResource(bid);
 	}
-
 }

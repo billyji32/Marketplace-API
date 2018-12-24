@@ -15,6 +15,6 @@ public class ProjectResourceAssembler implements ResourceAssembler<Project, Reso
 	public Resource<Project> toResource(Project project) {
 		return new Resource<>(project,
 				linkTo(methodOn(ProjectController.class).getProject(project.getId())).withSelfRel(),
-				linkTo(methodOn(ProjectController.class).getBids(project.getId())).withRel("bids"));
+				linkTo(methodOn(ProjectBidsController.class).getBidsOnProject(project.getId())).withRel("bids"));
 	}
 }

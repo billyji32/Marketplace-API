@@ -59,8 +59,7 @@ public class BuyerController extends ResourceController {
 	List<Bid> getBids(@PathVariable Long id) {
 		if(resourceExists(buyerRepository, id))
 			return bidRepository.findByBuyerId(id);
-		else
-			throw new ResourceNotFoundException();
+		else throw new ResourceNotFoundException();
 	}
 
 	@PostMapping
@@ -70,7 +69,7 @@ public class BuyerController extends ResourceController {
 	}
 
 	@PutMapping("/{id}")
-	ResponseEntity<Resource<Buyer>> replaceBuyer(@RequestBody Buyer newBuyer, @PathVariable Long id) throws URISyntaxException {
+	ResponseEntity<Resource<Buyer>> updateOrCreateNewBuyer(@RequestBody Buyer newBuyer, @PathVariable Long id) throws URISyntaxException {
 		Buyer updatedBuyer = buyerRepository.findById(id)
 				.map(oldBuyer -> {
 					oldBuyer.updateInfoWith(newBuyer);

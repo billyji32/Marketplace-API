@@ -3,10 +3,14 @@ package com.intuit.cg.backendtechassessment.marketplace.entity;
 import com.intuit.cg.backendtechassessment.shared.entity.DataType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.context.event.EventListener;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 //Use queries instead of unidirectional entity relationships
@@ -16,8 +20,12 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "Projects")
 public class Project extends DataType {
+
     @NotEmpty
     private String name;
+
+    @NotEmpty
+    private String description;
 
     @NotNull
     private Long sellerId;
@@ -26,7 +34,8 @@ public class Project extends DataType {
     //If not specified, defaults to 2 weeks from date submitted
     private LocalDateTime deadline = LocalDateTime.now().plusWeeks(2);
 
-    private String description;
+    @Positive
+    private BigDecimal buyItNowPrice;
 
     public void updateInfoWith(Project project) {
         this.name = project.name.isEmpty() ? this.name : project.name;
