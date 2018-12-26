@@ -1,6 +1,6 @@
-package com.intuit.cg.marketplace.marketplace.repository;
+package com.intuit.cg.marketplace.projects.repository;
 
-import com.intuit.cg.marketplace.marketplace.entity.Project;
+import com.intuit.cg.marketplace.projects.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

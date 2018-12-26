@@ -1,13 +1,12 @@
-package com.intuit.cg.marketplace.marketplace.controller;
+package com.intuit.cg.marketplace.projects.controller;
 
 import com.intuit.cg.marketplace.configuration.requestmappings.JsonRequestMappingTemplate;
+import com.intuit.cg.marketplace.projects.entity.Bid;
+import com.intuit.cg.marketplace.projects.repository.BidRepository;
+import com.intuit.cg.marketplace.projects.repository.ProjectRepository;
 import com.intuit.cg.marketplace.shared.controller.ResourceController;
 import com.intuit.cg.marketplace.shared.exceptions.InvalidBidException;
 import com.intuit.cg.marketplace.shared.exceptions.ResourceNotFoundException;
-import com.intuit.cg.marketplace.marketplace.entity.Bid;
-import com.intuit.cg.marketplace.marketplace.repository.BidRepository;
-import com.intuit.cg.marketplace.marketplace.repository.ProjectRepository;
-
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

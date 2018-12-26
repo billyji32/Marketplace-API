@@ -1,10 +1,11 @@
-package com.intuit.cg.marketplace.marketplace.entity;
+package com.intuit.cg.marketplace.projects.entity;
 
 import com.intuit.cg.marketplace.shared.entity.DataType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
@@ -27,12 +28,4 @@ public class Bid extends DataType {
 
     //This value gets set from the api ${id} value e.g. projects/${id}/bids since we post bids from the project root
     private Long projectId;
-
-    //The following variables are used for autobid implementation--maybe split out into its
-    //own entity?
-    private boolean autobid;
-    @Positive
-    private BigDecimal maxBidAmount;
-    @Positive
-    private BigDecimal bidAdditionalAmount;
 }

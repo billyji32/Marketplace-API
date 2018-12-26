@@ -1,13 +1,14 @@
-package com.intuit.cg.marketplace.marketplace.entity;
+package com.intuit.cg.marketplace.projects.entity;
 
 import com.intuit.cg.marketplace.shared.entity.DataType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -30,10 +31,12 @@ public class Project extends DataType {
 
     @NotNull
     //If not specified, defaults to 2 weeks from date submitted
-    private LocalDateTime deadline = LocalDateTime.now().plusWeeks(2);
+    private LocalDateTime deadline = LocalDateTime.now().withNano(0).plusWeeks(2);
 
-    @Positive
-    private BigDecimal buyItNowPrice;
+    @NotNull
+    @PositiveOrZero
+    //If not specified, defaults to 10000 dollars
+    private BigDecimal budget = BigDecimal.valueOf(10000);
 
     public void updateInfoWith(Project project) {
         this.name = project.name.isEmpty() ? this.name : project.name;

@@ -13,7 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @org.springframework.context.annotation.Configuration
 @EnableSwagger2
-@ComponentScan(basePackages={"com.intuit.cg.marketplace.marketplace","com.intuit.cg.marketplace.users"})
+@ComponentScan(basePackages={"com.intuit.cg.projects.users", "com.intuit.cg.projects.projects"})
 @SuppressWarnings("unused")
 public class SwaggerConfiguration {
 	@Bean

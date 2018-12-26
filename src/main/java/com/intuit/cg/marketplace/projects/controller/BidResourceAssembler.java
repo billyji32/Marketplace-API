@@ -1,7 +1,7 @@
-package com.intuit.cg.marketplace.marketplace.controller;
+package com.intuit.cg.marketplace.projects.controller;
 
+import com.intuit.cg.marketplace.projects.entity.Bid;
 import com.intuit.cg.marketplace.users.controller.BuyerController;
-import com.intuit.cg.marketplace.marketplace.entity.Bid;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;

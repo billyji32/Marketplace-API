@@ -1,6 +1,6 @@
-package com.intuit.cg.marketplace.marketplace.repository;
+package com.intuit.cg.marketplace.projects.repository;
 
-import com.intuit.cg.marketplace.marketplace.entity.Bid;
+import com.intuit.cg.marketplace.projects.entity.Bid;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

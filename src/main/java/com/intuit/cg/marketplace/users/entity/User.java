@@ -1,11 +1,11 @@
 package com.intuit.cg.marketplace.users.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-
 import com.intuit.cg.marketplace.shared.entity.DataType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotEmpty;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
