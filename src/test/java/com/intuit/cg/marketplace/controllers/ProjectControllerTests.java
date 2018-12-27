@@ -1,9 +1,9 @@
-package com.intuit.cg.marketplace.projects;
+package com.intuit.cg.marketplace.controllers;
 
-import com.intuit.cg.marketplace.projects.controller.ProjectController;
-import com.intuit.cg.marketplace.projects.controller.ProjectResourceAssembler;
-import com.intuit.cg.marketplace.projects.entity.Project;
-import com.intuit.cg.marketplace.projects.repository.ProjectRepository;
+import com.intuit.cg.marketplace.controllers.controller.ProjectController;
+import com.intuit.cg.marketplace.controllers.controller.ProjectResourceAssembler;
+import com.intuit.cg.marketplace.controllers.entity.Project;
+import com.intuit.cg.marketplace.controllers.repository.ProjectRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,11 +15,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
 import static com.intuit.cg.marketplace.configuration.requestmappings.RequestMappings.PROJECTS;
+import static com.intuit.cg.marketplace.utils.BigDecimalComparator.closeTo;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -44,7 +46,7 @@ public class ProjectControllerTests {
     @MockBean
     private ProjectResourceAssembler projectResourceAssembler;
 
-    Project project;
+    private Project project;
 
     @Before
     public void setup() {
@@ -53,6 +55,7 @@ public class ProjectControllerTests {
         project.setName("TestProject");
         project.setDescription("Project for testing");
         project.setSellerId(PROJECT_SELLER_ID);
+        project.setBudget(new BigDecimal(10000.001));
 
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
         when(projectRepository.findAll()).thenReturn(Collections.singletonList(project));
@@ -61,27 +64,25 @@ public class ProjectControllerTests {
 
     @Test
     public void testGetProjects() throws Exception {
-        projectMockMvc.perform(get(PROJECTS))
-            .andExpect(status().isOk());
+        final ResultActions result = projectMockMvc.perform(get(PROJECTS));
+        result.andExpect(status().isOk());
+        verifyJson(result, "_embedded.projectList[0].");
     }
 
     @Test
-    public void testGetValidProject() throws Exception {
+    public void testGetValidProjectWithDefaults() throws Exception {
         final ResultActions result = projectMockMvc.perform(get(PROJECTS + "/" + PROJECT_ID));
         result.andExpect(status().isOk());
-        verifyJson(result);
+        verifyJson(result, "");
     }
 
-    private void verifyJson(final ResultActions action) throws Exception {
-        action
-            .andExpect(jsonPath("id", is(project.getId().intValue())))
-            .andExpect(jsonPath("name", is(project.getName())))
-            .andExpect(jsonPath("deadline", is(project.getDeadline().toString())))
-            .andExpect(jsonPath("description", is(project.getDescription())))
-            .andExpect(jsonPath("sellerId", is(project.getSellerId().intValue())))
-            .andExpect(jsonPath("budget", is(project.getBudget().intValueExact())))
-            .andExpect(jsonPath("_links.self.href", is(BASE_PATH + project.getId())))
-            .andExpect(jsonPath("_links.bids.href", is(BASE_PATH + project.getId() + "/bids")));
+    @Test
+    public void testGetValidProjectWithOverridenDefaults() throws Exception {
+        project.setBudget(new BigDecimal(124.99));
+        project.setDeadline(LocalDateTime.now().withNano(0).plusDays(6).plusHours(2).plusMinutes(10));
+        final ResultActions result = projectMockMvc.perform(get(PROJECTS + "/" + PROJECT_ID));
+        result.andExpect(status().isOk());
+        verifyJson(result, "");
     }
 
     @Test
@@ -93,12 +94,12 @@ public class ProjectControllerTests {
 
     @Test
     public void testPostValidJson() throws Exception {
-        String validJson = "{\"name\":\"testProj\",\"description\":\"project for sale\", \"sellerId\":\"1\"}";
+        String validJson = "{\"name\":\"testProj\",\"description\":\"project for sale\", \"sellerId\":\"1\", \"budget\":\"10000.00\"}";
         projectMockMvc.perform(post(PROJECTS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validJson)
         )
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -108,6 +109,18 @@ public class ProjectControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidJson)
         )
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
+    }
+
+    private void verifyJson(final ResultActions action, final String jsonPrefix) throws Exception {
+        action
+                .andExpect(jsonPath(jsonPrefix + "id", is(project.getId().intValue())))
+                .andExpect(jsonPath(jsonPrefix + "name", is(project.getName())))
+                .andExpect(jsonPath(jsonPrefix + "deadline", is(project.getDeadline().toString())))
+                .andExpect(jsonPath(jsonPrefix + "description", is(project.getDescription())))
+                .andExpect(jsonPath(jsonPrefix + "sellerId", is(project.getSellerId().intValue())))
+                .andExpect(jsonPath(jsonPrefix + "budget", is(closeTo(project.getBudget().doubleValue()))))
+                .andExpect(jsonPath(jsonPrefix + "_links.self.href", is(BASE_PATH + project.getId())))
+                .andExpect(jsonPath(jsonPrefix + "_links.bids.href", is(BASE_PATH + project.getId() + "/bids")));
     }
 }

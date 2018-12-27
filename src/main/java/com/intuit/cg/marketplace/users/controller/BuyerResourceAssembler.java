@@ -11,10 +11,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @Component
 public class BuyerResourceAssembler implements ResourceAssembler<Buyer, Resource<Buyer>> {
 
-	@Override
-	public Resource<Buyer> toResource(Buyer buyer) {
-		return new Resource<>(buyer,
-				linkTo(methodOn(BuyerController.class).getBuyer(buyer.getId())).withSelfRel(),
-				linkTo(methodOn(BuyerController.class).getBidsByBuyer(buyer.getId())).withRel("bids"));
-	}
+    @Override
+    public Resource<Buyer> toResource(Buyer buyer) {
+        return new Resource<>(buyer,
+                linkTo(methodOn(BuyerController.class).getBuyer(buyer.getId())).withSelfRel(),
+                linkTo(methodOn(BuyerController.class).getBidsByBuyer(buyer.getId())).withRel("bids"));
+    }
 }

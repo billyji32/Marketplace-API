@@ -1,4 +1,4 @@
-package com.intuit.cg.marketplace.projects.entity;
+package com.intuit.cg.marketplace.controllers.entity;
 
 import com.intuit.cg.marketplace.shared.entity.DataType;
 import lombok.Data;
@@ -26,6 +26,6 @@ public class Bid extends DataType {
     //Use a BigDecimal here to prevent precision/rounding errors
     private BigDecimal amount;
 
-    //This value gets set from the api ${id} value e.g. projects/${id}/bids since we post bids from the project root
+    //This value gets set from the api ${id} value e.g. controllers/${id}/bids since we post bids from the project root
     private Long projectId;
 }

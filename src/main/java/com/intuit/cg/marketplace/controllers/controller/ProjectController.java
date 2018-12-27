@@ -1,8 +1,8 @@
-package com.intuit.cg.marketplace.projects.controller;
+package com.intuit.cg.marketplace.controllers.controller;
 
 import com.intuit.cg.marketplace.configuration.requestmappings.JsonRequestMappingTemplate;
-import com.intuit.cg.marketplace.projects.entity.Project;
-import com.intuit.cg.marketplace.projects.repository.ProjectRepository;
+import com.intuit.cg.marketplace.controllers.entity.Project;
+import com.intuit.cg.marketplace.controllers.repository.ProjectRepository;
 import com.intuit.cg.marketplace.shared.controller.ResourceController;
 import com.intuit.cg.marketplace.shared.exceptions.ResourceNotFoundException;
 import org.springframework.hateoas.Resource;

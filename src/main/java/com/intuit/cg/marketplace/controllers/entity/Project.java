@@ -1,4 +1,4 @@
-package com.intuit.cg.marketplace.projects.entity;
+package com.intuit.cg.marketplace.controllers.entity;
 
 import com.intuit.cg.marketplace.shared.entity.DataType;
 import lombok.Data;
@@ -8,12 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 //Use queries instead of unidirectional entity relationships
-//Can use bidirectional entity relationships but bids -> projects
+//Can use bidirectional entity relationships but bids -> controllers
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -34,9 +34,8 @@ public class Project extends DataType {
     private LocalDateTime deadline = LocalDateTime.now().withNano(0).plusWeeks(2);
 
     @NotNull
-    @PositiveOrZero
-    //If not specified, defaults to 10000 dollars
-    private BigDecimal budget = BigDecimal.valueOf(10000);
+    @Positive
+    private BigDecimal budget;
 
     public void updateInfoWith(Project project) {
         this.name = project.name.isEmpty() ? this.name : project.name;
