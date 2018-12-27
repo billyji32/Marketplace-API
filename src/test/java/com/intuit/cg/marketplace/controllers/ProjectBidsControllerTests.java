@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static com.intuit.cg.marketplace.configuration.requestmappings.RequestMappings.PROJECTS;
-import static com.intuit.cg.marketplace.utils.BigDecimalComparator.closeTo;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -70,11 +69,11 @@ public class ProjectBidsControllerTests {
         project.setName("TestProject");
         project.setDescription("Project for testing");
         project.setSellerId(PROJECT_SELLER_ID);
-        project.setBudget(new BigDecimal(10000.001));
+        project.setBudget(10000.00);
 
         bid = new Bid();
         bid.setId(BID_ID);
-        bid.setAmount(new BigDecimal(7000.001));
+        bid.setAmount(7000.0);
         bid.setBuyerId(BUYER_ID);
         bid.setProjectId(PROJECT_ID);
 
@@ -150,7 +149,7 @@ public class ProjectBidsControllerTests {
         action
                 .andExpect(jsonPath(jsonPrefix + "id", is(bid.getId().intValue())))
                 .andExpect(jsonPath(jsonPrefix + "buyerId", is(bid.getBuyerId().intValue())))
-                .andExpect(jsonPath(jsonPrefix + "amount", is(closeTo(bid.getAmount().doubleValue()))))
+                .andExpect(jsonPath(jsonPrefix + "amount", is(bid.getAmount())))
                 .andExpect(jsonPath(jsonPrefix + "_links.self.href", is(BIDS_BASE_PATH + bid.getId())))
                 .andExpect(jsonPath(jsonPrefix + "_links.buyer.href", is(BUYERS_BASE_PATH + bid.getBuyerId())))
                 .andExpect(jsonPath(jsonPrefix + "_links.project.href", is(PROJECTS_BASE_PATH + bid.getProjectId())));

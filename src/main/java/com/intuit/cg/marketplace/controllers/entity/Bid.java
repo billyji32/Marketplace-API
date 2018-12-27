@@ -23,8 +23,7 @@ public class Bid extends DataType {
 
     @NotNull
     @Positive
-    //Use a BigDecimal here to prevent precision/rounding errors
-    private BigDecimal amount;
+    private double amount;
 
     //This value gets set from the api ${id} value e.g. controllers/${id}/bids since we post bids from the project root
     private Long projectId;

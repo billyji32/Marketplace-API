@@ -35,7 +35,7 @@ public class Project extends DataType {
 
     @NotNull
     @Positive
-    private BigDecimal budget;
+    private double budget;
 
     public void updateInfoWith(Project project) {
         this.name = project.name.isEmpty() ? this.name : project.name;

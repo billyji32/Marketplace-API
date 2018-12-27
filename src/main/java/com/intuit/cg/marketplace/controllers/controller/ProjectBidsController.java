@@ -32,7 +32,7 @@ public class ProjectBidsController extends ResourceController {
     private final BidRepository bidRepository;
     private final BidResourceAssembler bidAssembler;
     //Maps projectId to lowest bid on that project. Saves time during validation of new bids
-    private final Map<Long, BigDecimal> lowestBidCache = new HashMap<>();
+    private final Map<Long, Double> lowestBidCache = new HashMap<>();
 
     ProjectBidsController(ProjectRepository projectRepository,
                           BidRepository bidRepository, BidResourceAssembler bidAssembler) {
@@ -90,18 +90,18 @@ public class ProjectBidsController extends ResourceController {
     //In reality this isn't desired since we might want to pay more for a better buyer
     //but I am including it to fulfill the project specifications
     private boolean bidAmountGreaterThanCurrentHighest(Bid newBid, Project project) {
-        BigDecimal curMinBid = lowestBidCache.getOrDefault(project.getId(), BigDecimal.ZERO);
-        if (curMinBid.equals(BigDecimal.ZERO) || newBid.getAmount().compareTo(curMinBid) < 0)
+        double curMinBid = lowestBidCache.getOrDefault(project.getId(), 0.0);
+        if (curMinBid == 0.0 || newBid.getAmount() < curMinBid)
             return true;
         else
-            throw new InvalidBidException("Your bid is not lower than the current lowest bid of " + curMinBid.toString());
+            throw new InvalidBidException("Your bid is not lower than the current lowest bid of " + curMinBid);
     }
 
     private boolean bidAmountLessThanBudget(Bid newBid, Project project) {
-        BigDecimal maxBudget = project.getBudget();
-        if (project.getBudget().compareTo(newBid.getAmount()) > 0)
+        double maxBudget = project.getBudget();
+        if (project.getBudget() >= newBid.getAmount())
             return true;
         else
-            throw new InvalidBidException("Bid is greater than the max budget of " + maxBudget.toString());
+            throw new InvalidBidException("Bid is greater than the max budget of " + maxBudget);
     }
 }

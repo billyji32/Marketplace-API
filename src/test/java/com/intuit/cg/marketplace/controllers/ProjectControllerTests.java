@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static com.intuit.cg.marketplace.configuration.requestmappings.RequestMappings.PROJECTS;
-import static com.intuit.cg.marketplace.utils.BigDecimalComparator.closeTo;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -55,7 +54,7 @@ public class ProjectControllerTests {
         project.setName("TestProject");
         project.setDescription("Project for testing");
         project.setSellerId(PROJECT_SELLER_ID);
-        project.setBudget(new BigDecimal(10000.001));
+        project.setBudget(10000.0);
 
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
         when(projectRepository.findAll()).thenReturn(Collections.singletonList(project));
@@ -78,7 +77,7 @@ public class ProjectControllerTests {
 
     @Test
     public void testGetValidProjectWithOverridenDefaults() throws Exception {
-        project.setBudget(new BigDecimal(124.99));
+        project.setBudget(124.99);
         project.setDeadline(LocalDateTime.now().withNano(0).plusDays(6).plusHours(2).plusMinutes(10));
         final ResultActions result = projectMockMvc.perform(get(PROJECTS + "/" + PROJECT_ID));
         result.andExpect(status().isOk());
@@ -119,7 +118,7 @@ public class ProjectControllerTests {
                 .andExpect(jsonPath(jsonPrefix + "deadline", is(project.getDeadline().toString())))
                 .andExpect(jsonPath(jsonPrefix + "description", is(project.getDescription())))
                 .andExpect(jsonPath(jsonPrefix + "sellerId", is(project.getSellerId().intValue())))
-                .andExpect(jsonPath(jsonPrefix + "budget", is(closeTo(project.getBudget().doubleValue()))))
+                .andExpect(jsonPath(jsonPrefix + "budget", is(project.getBudget())))
                 .andExpect(jsonPath(jsonPrefix + "_links.self.href", is(BASE_PATH + project.getId())))
                 .andExpect(jsonPath(jsonPrefix + "_links.bids.href", is(BASE_PATH + project.getId() + "/bids")));
     }
