@@ -26,7 +26,6 @@ import static com.intuit.cg.marketplace.configuration.requestmappings.RequestMap
 //so as to fit with the rest of the api design, but for the purposes of this demo this should be fine.
 @RestController
 @JsonRequestMappingTemplate(value = PROJECTS)
-@SuppressWarnings("unused")
 public class ProjectBidsController extends ResourceController {
     private final ProjectRepository projectRepository;
     private final BidRepository bidRepository;
@@ -52,14 +51,14 @@ public class ProjectBidsController extends ResourceController {
     }
 
     @GetMapping("/{id}/bids/lowest")
-    ResponseEntity<Resource<Bid>> getLowestBidOnProject(@PathVariable Long id) {
+    Resource<Bid> getLowestBidOnProject(@PathVariable Long id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
 
-        Resource<Bid> bidResource = bidAssembler.toResource(project.getLowestBid());
-        return new ResponseEntity<>(bidResource, HttpStatus.OK);
+        return bidAssembler.toResource(project.getLowestBid());
     }
 
+    //Return a ResponseEntity here due to possibility of good/bad request
     @PostMapping("/{id}/bids")
     ResponseEntity<Resource<Bid>> newBidOnProject(@RequestBody @Valid Bid bid, @PathVariable Long id) {
         Project project = projectRepository.findById(id)
@@ -99,7 +98,7 @@ public class ProjectBidsController extends ResourceController {
 
     private boolean bidAmountLessThanBudget(Bid newBid, Project project) {
         double maxBudget = project.getBudget();
-        if (project.getBudget() >= newBid.getAmount())
+        if (maxBudget >= newBid.getAmount())
             return true;
         else
             throw new InvalidBidException("Bid is greater than the max budget of " + maxBudget);

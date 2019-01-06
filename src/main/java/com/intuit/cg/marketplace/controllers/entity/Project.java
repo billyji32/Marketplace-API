@@ -1,5 +1,6 @@
 package com.intuit.cg.marketplace.controllers.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.intuit.cg.marketplace.configuration.DeadlineSerializer;
 import com.intuit.cg.marketplace.shared.entity.DataType;
@@ -18,9 +19,9 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "Projects")
-//This exclusion is required to prevent a cyclic structure of projects <-> bids and projects <-> sellers,
-//resulting in stackoverflow when running hashcode method to compare
-@EqualsAndHashCode(exclude = {"bids", "seller"})
+//This exclusion is required to prevent a cyclic structure of projects <-> bids,
+//resulting in stack overflow when running hashcode method to compare
+@EqualsAndHashCode(exclude = "bids")
 public class Project extends DataType {
 
     @NotEmpty
@@ -43,15 +44,17 @@ public class Project extends DataType {
     private Seller seller;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "project", orphanRemoval = true)
+    @JsonIgnore
     private List<Bid> bids = new ArrayList<>();
 
     public void addBid(Bid bid) {
-        bids.add(bid);
         bid.setProject(this);
+        bids.add(bid);
     }
 
     //Because the latest bid added is always the lowest bid, we can just return it.
     //If no bids have been made, return a dummy bid with 0.0 as the amount
+    @JsonIgnore
     public Bid getLowestBid() {
         if (!bids.isEmpty())
             return bids.get(bids.size() - 1);

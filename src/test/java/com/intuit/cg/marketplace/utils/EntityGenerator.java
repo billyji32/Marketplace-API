@@ -36,8 +36,8 @@ public class EntityGenerator {
         Bid bid = new Bid();
         bid.setId(id);
         bid.setBuyer(buyer);
-        bid.setProject(project);
         bid.setAmount(DEFAULT_VALID_BID_AMOUNT);
+        project.addBid(bid);
         return bid;
     }
 

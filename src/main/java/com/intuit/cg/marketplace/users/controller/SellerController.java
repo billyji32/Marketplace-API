@@ -26,17 +26,14 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @JsonRequestMappingTemplate(value = SELLERS)
-@SuppressWarnings("unused")
 public class SellerController extends ResourceController {
     private final SellerRepository sellerRepository;
-    private final ProjectRepository projectRepository;
     private final SellerResourceAssembler sellerAssembler;
     private final ProjectResourceAssembler projectAssembler;
 
-    SellerController(SellerRepository sRepository, ProjectRepository pRepository,
-                     SellerResourceAssembler sAssembler, ProjectResourceAssembler pAssembler) {
+    SellerController(SellerRepository sRepository, SellerResourceAssembler sAssembler,
+                     ProjectResourceAssembler pAssembler) {
         this.sellerRepository = sRepository;
-        this.projectRepository = pRepository;
         this.sellerAssembler = sAssembler;
         this.projectAssembler = pAssembler;
     }
@@ -61,14 +58,14 @@ public class SellerController extends ResourceController {
 
     @GetMapping("/{id}/projects")
     Resources<Resource<Project>> getProjectsBySeller(@PathVariable Long id) {
-        if (resourceExists(sellerRepository, id)) {
-            List<Resource<Project>> projects = projectRepository.findBySellerId(id).stream()
-                    .map(projectAssembler::toResource)
-                    .collect(Collectors.toList());
+        Seller seller = sellerRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
 
-            return new Resources<>(projects);
-        } else
-            throw new ResourceNotFoundException();
+        List<Resource<Project>> projects = seller.getProjects().stream()
+                .map(projectAssembler::toResource)
+                .collect(Collectors.toList());
+
+        return new Resources<>(projects);
     }
 
     @PostMapping

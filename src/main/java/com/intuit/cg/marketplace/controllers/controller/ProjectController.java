@@ -5,6 +5,8 @@ import com.intuit.cg.marketplace.controllers.entity.Project;
 import com.intuit.cg.marketplace.controllers.repository.ProjectRepository;
 import com.intuit.cg.marketplace.shared.controller.ResourceController;
 import com.intuit.cg.marketplace.shared.exceptions.ResourceNotFoundException;
+import com.intuit.cg.marketplace.users.controller.SellerResourceAssembler;
+import com.intuit.cg.marketplace.users.entity.Seller;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @JsonRequestMappingTemplate(value = PROJECTS)
-@SuppressWarnings("unused")
 public class ProjectController extends ResourceController {
     private final ProjectRepository projectRepository;
     private final ProjectResourceAssembler projectAssembler;

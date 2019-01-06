@@ -26,17 +26,14 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @JsonRequestMappingTemplate(value = BUYERS)
-@SuppressWarnings("unused")
 public class BuyerController extends ResourceController {
     private final BuyerRepository buyerRepository;
-    private final BidRepository bidRepository;
     private final BuyerResourceAssembler buyerAssembler;
     private final BidResourceAssembler bidAssembler;
 
-    BuyerController(BuyerRepository buyerRepository, BidRepository bidRepository,
-                    BuyerResourceAssembler buyerAssembler, BidResourceAssembler bidAssembler) {
+    BuyerController(BuyerRepository buyerRepository, BuyerResourceAssembler buyerAssembler,
+                    BidResourceAssembler bidAssembler) {
         this.buyerRepository = buyerRepository;
-        this.bidRepository = bidRepository;
         this.buyerAssembler = buyerAssembler;
         this.bidAssembler = bidAssembler;
     }
@@ -61,13 +58,13 @@ public class BuyerController extends ResourceController {
 
     @GetMapping("/{id}/bids")
     Resources<Resource<Bid>> getBidsByBuyer(@PathVariable Long id) {
-        if (resourceExists(buyerRepository, id)) {
-            List<Resource<Bid>> bids = bidRepository.findByBuyerId(id).stream()
+        Buyer buyer = buyerRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        List<Resource<Bid>> bids = buyer.getBids().stream()
                     .map(bidAssembler::toResource)
                     .collect(Collectors.toList());
-
-            return new Resources<>(bids);
-        } else throw new ResourceNotFoundException();
+        return new Resources<>(bids);
     }
 
     @PostMapping

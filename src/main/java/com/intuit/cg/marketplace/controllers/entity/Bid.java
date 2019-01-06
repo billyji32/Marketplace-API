@@ -1,5 +1,6 @@
 package com.intuit.cg.marketplace.controllers.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intuit.cg.marketplace.shared.entity.DataType;
 import com.intuit.cg.marketplace.users.entity.Buyer;
 import lombok.Data;

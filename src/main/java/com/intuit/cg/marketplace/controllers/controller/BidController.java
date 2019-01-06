@@ -25,7 +25,7 @@ class BidController extends ResourceController {
     private final BidRepository bidRepository;
     private final BidResourceAssembler bidAssembler;
 
-    BidController(BidRepository bidRepository, BidResourceAssembler bidAssembler, BuyerResourceAssembler buyerAssembler) {
+    BidController(BidRepository bidRepository, BidResourceAssembler bidAssembler) {
         this.bidRepository = bidRepository;
         this.bidAssembler = bidAssembler;
     }
