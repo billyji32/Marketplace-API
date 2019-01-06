@@ -27,7 +27,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 @JsonRequestMappingTemplate(value = SELLERS)
 @SuppressWarnings("unused")
-class SellerController extends ResourceController {
+public class SellerController extends ResourceController {
     private final SellerRepository sellerRepository;
     private final ProjectRepository projectRepository;
     private final SellerResourceAssembler sellerAssembler;
@@ -52,7 +52,7 @@ class SellerController extends ResourceController {
     }
 
     @GetMapping("/{id}")
-    Resource<Seller> getSeller(@PathVariable Long id) {
+    public Resource<Seller> getSeller(@PathVariable Long id) {
         Seller seller = sellerRepository.findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
 

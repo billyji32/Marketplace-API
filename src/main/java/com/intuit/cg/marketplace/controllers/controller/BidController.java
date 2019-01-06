@@ -5,6 +5,7 @@ import com.intuit.cg.marketplace.controllers.entity.Bid;
 import com.intuit.cg.marketplace.controllers.repository.BidRepository;
 import com.intuit.cg.marketplace.shared.controller.ResourceController;
 import com.intuit.cg.marketplace.shared.exceptions.ResourceNotFoundException;
+import com.intuit.cg.marketplace.users.controller.BuyerResourceAssembler;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +23,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @JsonRequestMappingTemplate(value = BIDS)
 class BidController extends ResourceController {
     private final BidRepository bidRepository;
-    private final BidResourceAssembler assembler;
+    private final BidResourceAssembler bidAssembler;
 
-    BidController(BidRepository bidRepository, BidResourceAssembler assembler) {
+    BidController(BidRepository bidRepository, BidResourceAssembler bidAssembler, BuyerResourceAssembler buyerAssembler) {
         this.bidRepository = bidRepository;
-        this.assembler = assembler;
+        this.bidAssembler = bidAssembler;
     }
 
     //In reality I don't think this method is necessary or correct to include.
@@ -35,7 +36,7 @@ class BidController extends ResourceController {
     @GetMapping
     Resources<Resource<Bid>> getBids() {
         List<Resource<Bid>> bids = bidRepository.findAll().stream()
-                .map(assembler::toResource)
+                .map(bidAssembler::toResource)
                 .collect(Collectors.toList());
 
         return new Resources<>(bids,
@@ -47,6 +48,6 @@ class BidController extends ResourceController {
         Bid bid = bidRepository.findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
 
-        return assembler.toResource(bid);
+        return bidAssembler.toResource(bid);
     }
 }

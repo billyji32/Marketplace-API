@@ -15,15 +15,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.intuit.cg.marketplace.configuration.requestmappings.RequestMappings.PROJECTS;
 
+//This controller exists due to how much bids and projects need to interact. Bids need to be checked against current values on projects,
+//and so I decided to set the api for posting new bids as projects/id/bids. I think that you could/should flatten it to just post new bids to /bids
+//so as to fit with the rest of the api design, but for the purposes of this demo this should be fine.
 @RestController
 @JsonRequestMappingTemplate(value = PROJECTS)
 @SuppressWarnings("unused")
@@ -31,8 +31,6 @@ public class ProjectBidsController extends ResourceController {
     private final ProjectRepository projectRepository;
     private final BidRepository bidRepository;
     private final BidResourceAssembler bidAssembler;
-    //Maps projectId to lowest bid on that project. Saves time during validation of new bids
-    private final Map<Long, Double> lowestBidCache = new HashMap<>();
 
     ProjectBidsController(ProjectRepository projectRepository,
                           BidRepository bidRepository, BidResourceAssembler bidAssembler) {
@@ -43,32 +41,34 @@ public class ProjectBidsController extends ResourceController {
 
     @GetMapping("/{id}/bids")
     Resources<Resource<Bid>> getBidsOnProject(@PathVariable Long id) {
-        if (resourceExists(projectRepository, id)) {
-            List<Resource<Bid>> bids = bidRepository.findByProjectId(id).stream()
-                    .map(bidAssembler::toResource)
-                    .collect(Collectors.toList());
+        Project project = projectRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
 
-            return new Resources<>(bids);
-        } else throw new ResourceNotFoundException();
+        List<Resource<Bid>> bids = project.getBids().stream()
+                .map(bidAssembler::toResource)
+                .collect(Collectors.toList());
+
+        return new Resources<>(bids);
     }
 
     @GetMapping("/{id}/bids/lowest")
-    public ResponseEntity<Resource<Bid>> getLowestBidOnProject(@PathVariable Long id) {
-        if (resourceExists(projectRepository, id)) {
-            //Don't use the lowestBidCache here because we need the entire Bid object in the response
-            Resource<Bid> bidResource = bidAssembler.toResource(bidRepository.findTopByProjectIdOrderByAmountAsc(id));
-            return new ResponseEntity<>(bidResource, HttpStatus.OK);
-        } else throw new ResourceNotFoundException();
+    ResponseEntity<Resource<Bid>> getLowestBidOnProject(@PathVariable Long id) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        Resource<Bid> bidResource = bidAssembler.toResource(project.getLowestBid());
+        return new ResponseEntity<>(bidResource, HttpStatus.OK);
     }
 
     @PostMapping("/{id}/bids")
     ResponseEntity<Resource<Bid>> newBidOnProject(@RequestBody @Valid Bid bid, @PathVariable Long id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
+
         if (isValidBid(bid, project)) {
-            bid.setProjectId(id);
+            project.addBid(bid);
+
             Resource<Bid> bidResource = bidAssembler.toResource(bidRepository.save(bid));
-            lowestBidCache.put(id, bid.getAmount());
             return new ResponseEntity<>(bidResource, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -76,7 +76,7 @@ public class ProjectBidsController extends ResourceController {
 
     private boolean isValidBid(Bid newBid, Project project) {
         return projectDeadlineNotPassed(project) &&
-                bidAmountGreaterThanCurrentHighest(newBid, project) &&
+                bidAmountLessThanCurrentLowest(newBid, project) &&
                 bidAmountLessThanBudget(newBid, project);
     }
 
@@ -89,8 +89,8 @@ public class ProjectBidsController extends ResourceController {
 
     //In reality this isn't desired since we might want to pay more for a better buyer
     //but I am including it to fulfill the project specifications
-    private boolean bidAmountGreaterThanCurrentHighest(Bid newBid, Project project) {
-        double curMinBid = lowestBidCache.getOrDefault(project.getId(), 0.0);
+    private boolean bidAmountLessThanCurrentLowest(Bid newBid, Project project) {
+        double curMinBid = project.getLowestBid().getAmount();
         if (curMinBid == 0.0 || newBid.getAmount() < curMinBid)
             return true;
         else

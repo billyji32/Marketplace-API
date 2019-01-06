@@ -15,7 +15,7 @@ public class BidResourceAssembler implements ResourceAssembler<Bid, Resource<Bid
     public Resource<Bid> toResource(Bid bid) {
         return new Resource<>(bid,
                 linkTo(methodOn(BidController.class).getBid(bid.getId())).withSelfRel(),
-                linkTo(methodOn(BuyerController.class).getBuyer(bid.getBuyerId())).withRel("buyer"),
-                linkTo(methodOn(ProjectController.class).getProject(bid.getProjectId())).withRel("project"));
+                linkTo(methodOn(BuyerController.class).getBuyer(bid.getBuyer().getId())).withRel("buyer"),
+                linkTo(methodOn(ProjectController.class).getProject(bid.getProject().getId())).withRel("project"));
     }
 }

@@ -14,6 +14,6 @@ public class SellerResourceAssembler implements ResourceAssembler<Seller, Resour
     public Resource<Seller> toResource(Seller seller) {
         return new Resource<>(seller,
                 linkTo(methodOn(SellerController.class).getSeller(seller.getId())).withSelfRel(),
-                linkTo(methodOn(SellerController.class).getProjectsBySeller(seller.getId())).withRel("controllers"));
+                linkTo(methodOn(SellerController.class).getProjectsBySeller(seller.getId())).withRel("projects"));
     }
 }

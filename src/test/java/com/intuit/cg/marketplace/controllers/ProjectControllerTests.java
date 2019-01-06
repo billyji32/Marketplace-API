@@ -4,6 +4,7 @@ import com.intuit.cg.marketplace.controllers.controller.ProjectController;
 import com.intuit.cg.marketplace.controllers.controller.ProjectResourceAssembler;
 import com.intuit.cg.marketplace.controllers.entity.Project;
 import com.intuit.cg.marketplace.controllers.repository.ProjectRepository;
+import com.intuit.cg.marketplace.users.entity.Seller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +16,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
 import static com.intuit.cg.marketplace.configuration.requestmappings.RequestMappings.PROJECTS;
+import static com.intuit.cg.marketplace.utils.EntityGenerator.newProject;
+import static com.intuit.cg.marketplace.utils.EntityGenerator.newSeller;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,7 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ProjectControllerTests {
     private static final Long PROJECT_ID = 1L;
     private static final Long PROJECT_SELLER_ID = 1L;
-    private static final String BASE_PATH = "http://localhost/projects/";
+    private static final String PROJECTS_BASE_PATH = "http://localhost/projects/";
+    private static final String SELLERS_BASE_PATH = "http://localhost/sellers/";
 
     @Autowired
     private MockMvc projectMockMvc;
@@ -49,12 +52,8 @@ public class ProjectControllerTests {
 
     @Before
     public void setup() {
-        project = new Project();
-        project.setId(PROJECT_ID);
-        project.setName("TestProject");
-        project.setDescription("Project for testing");
-        project.setSellerId(PROJECT_SELLER_ID);
-        project.setBudget(10000.0);
+        Seller seller = newSeller(PROJECT_SELLER_ID);
+        project = newProject(PROJECT_ID, seller);
 
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
         when(projectRepository.findAll()).thenReturn(Collections.singletonList(project));
@@ -65,7 +64,7 @@ public class ProjectControllerTests {
     public void testGetProjects() throws Exception {
         final ResultActions result = projectMockMvc.perform(get(PROJECTS));
         result.andExpect(status().isOk());
-        verifyJson(result, "_embedded.projectList[0].");
+        verifyJson(result, "_embedded.projects[0].");
     }
 
     @Test
@@ -93,7 +92,7 @@ public class ProjectControllerTests {
 
     @Test
     public void testPostValidJson() throws Exception {
-        String validJson = "{\"name\":\"testProj\",\"description\":\"project for sale\", \"sellerId\":\"1\", \"budget\":\"10000.00\"}";
+        String validJson = "{\"name\":\"testProj\",\"description\":\"project for sale\", \"budget\":\"10000.00\"}";
         projectMockMvc.perform(post(PROJECTS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validJson)
@@ -103,7 +102,7 @@ public class ProjectControllerTests {
 
     @Test
     public void testPostInvalidJson() throws Exception {
-        String invalidJson = "{\"name\":\"testProj\", \"sellerId\":\"1\"}";
+        String invalidJson = "{\"name\":\"testProj\"}";
         projectMockMvc.perform(post(PROJECTS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidJson)
@@ -117,9 +116,10 @@ public class ProjectControllerTests {
                 .andExpect(jsonPath(jsonPrefix + "name", is(project.getName())))
                 .andExpect(jsonPath(jsonPrefix + "deadline", is(project.getDeadline().toString())))
                 .andExpect(jsonPath(jsonPrefix + "description", is(project.getDescription())))
-                .andExpect(jsonPath(jsonPrefix + "sellerId", is(project.getSellerId().intValue())))
                 .andExpect(jsonPath(jsonPrefix + "budget", is(project.getBudget())))
-                .andExpect(jsonPath(jsonPrefix + "_links.self.href", is(BASE_PATH + project.getId())))
-                .andExpect(jsonPath(jsonPrefix + "_links.bids.href", is(BASE_PATH + project.getId() + "/bids")));
+                .andExpect(jsonPath(jsonPrefix + "_links.self.href", is(PROJECTS_BASE_PATH + project.getId())))
+                .andExpect(jsonPath(jsonPrefix + "_links.lowestBid.href", is(PROJECTS_BASE_PATH + project.getId() + "/bids/lowest")))
+                .andExpect(jsonPath(jsonPrefix + "_links.bids.href", is(PROJECTS_BASE_PATH + project.getId() + "/bids")))
+                .andExpect(jsonPath(jsonPrefix + "_links.seller.href", is(SELLERS_BASE_PATH + project.getId())));
     }
 }

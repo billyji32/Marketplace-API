@@ -9,7 +9,7 @@ import javax.persistence.MappedSuperclass;
 
 @Data
 @MappedSuperclass
-public abstract class DataType {
+public class DataType {
     //Specify GenerationType.IDENTITY because default is GenerationType.AUTO which creates unique values across all entities
     //rather than unique values per entity.
     @Id

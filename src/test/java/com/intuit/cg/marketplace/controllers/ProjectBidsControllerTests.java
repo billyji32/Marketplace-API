@@ -7,6 +7,8 @@ import com.intuit.cg.marketplace.controllers.entity.Bid;
 import com.intuit.cg.marketplace.controllers.entity.Project;
 import com.intuit.cg.marketplace.controllers.repository.BidRepository;
 import com.intuit.cg.marketplace.controllers.repository.ProjectRepository;
+import com.intuit.cg.marketplace.users.entity.Buyer;
+import com.intuit.cg.marketplace.users.entity.Seller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,12 +20,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
 import static com.intuit.cg.marketplace.configuration.requestmappings.RequestMappings.PROJECTS;
+import static com.intuit.cg.marketplace.utils.DefaultTestValues.*;
+import static com.intuit.cg.marketplace.utils.EntityGenerator.*;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -44,8 +47,6 @@ public class ProjectBidsControllerTests {
     private static final String BUYERS_BASE_PATH = "http://localhost/buyers/";
     private static final String PROJECTS_BASE_PATH = "http://localhost/projects/";
 
-    private static final BigDecimal PRECISION = new BigDecimal(0.00001);
-
     @Autowired
     private MockMvc projectMockMvc;
 
@@ -64,18 +65,11 @@ public class ProjectBidsControllerTests {
 
     @Before
     public void setup() {
-        project = new Project();
-        project.setId(PROJECT_ID);
-        project.setName("TestProject");
-        project.setDescription("Project for testing");
-        project.setSellerId(PROJECT_SELLER_ID);
-        project.setBudget(10000.00);
+        Seller seller = newSeller(PROJECT_SELLER_ID);
+        Buyer buyer = newBuyer(BUYER_ID);
 
-        bid = new Bid();
-        bid.setId(BID_ID);
-        bid.setAmount(7000.0);
-        bid.setBuyerId(BUYER_ID);
-        bid.setProjectId(PROJECT_ID);
+        project = newProject(PROJECT_ID, seller);
+        bid = newBid(BID_ID, buyer, project);
 
         when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
         when(projectRepository.findAll()).thenReturn(Collections.singletonList(project));
@@ -90,7 +84,7 @@ public class ProjectBidsControllerTests {
     public void testGetBidsByProjectId() throws Exception {
         final ResultActions result = projectMockMvc.perform(get(PROJECTS + "/" + PROJECT_ID + "/bids"));
         result.andExpect(status().isOk());
-        verifyJson(result, "_embedded.bidList[0].");
+        verifyJson(result, "_embedded.bids[0].");
     }
 
     @Test
@@ -109,14 +103,14 @@ public class ProjectBidsControllerTests {
 
     @Test
     public void testPostWithValidAmount() throws Exception {
-        String validJsonWithAmountEqualsToBudget = "{\"amount\":\"10000\",\"buyerId\":\"1\"}";
+        String validJsonWithAmountEqualsToBudget = "{\"amount\":\"" + DEFAULT_PROJECT_BUDGET + "\"}";
         projectMockMvc.perform(post(PROJECTS + "/" + PROJECT_ID + "/bids")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validJsonWithAmountEqualsToBudget)
         )
                 .andExpect(status().isOk());
 
-        String validJsonWithAmountLessThanBudget = "{\"amount\":\"1000\",\"buyerId\":\"1\"}";
+        String validJsonWithAmountLessThanBudget = "{\"amount\":\"" + DEFAULT_VALID_BID_AMOUNT + "\"}";
         projectMockMvc.perform(post(PROJECTS + "/" + PROJECT_ID + "/bids")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validJsonWithAmountLessThanBudget)
@@ -126,7 +120,7 @@ public class ProjectBidsControllerTests {
 
     @Test
     public void testInvalidPostWithAmountOverBudget() throws Exception {
-        String invalidJson = "{\"amount\":\"100000\",\"buyerId\":\"1\"}";
+        String invalidJson = "{\"amount\":\"" + DEFAULT_INVALID_BID_AMOUNT + "\"}";
         projectMockMvc.perform(post(PROJECTS + "/" + PROJECT_ID + "/bids")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidJson)
@@ -136,8 +130,19 @@ public class ProjectBidsControllerTests {
 
     @Test
     public void testInvalidPostOnClosedProject() throws Exception {
-        String validJson = "{\"amount\":\"1000\",\"buyerId\":\"1\"}";
+        String validJson = "{\"amount\":\"" + DEFAULT_VALID_BID_AMOUNT + "\"}";
         project.setDeadline(LocalDateTime.now());
+        projectMockMvc.perform(post(PROJECTS + "/" + PROJECT_ID + "/bids")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(validJson)
+        )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testInvalidPostBidHigherThanCurrentLowestBid() throws Exception {
+        String validJson = "{\"amount\":\"" + DEFAULT_VALID_BID_AMOUNT + "\",\"buyerId\":\"1\"}";
+        project.setLowestBid(1000);
         projectMockMvc.perform(post(PROJECTS + "/" + PROJECT_ID + "/bids")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(validJson)
@@ -148,10 +153,9 @@ public class ProjectBidsControllerTests {
     private void verifyJson(final ResultActions action, final String jsonPrefix) throws Exception {
         action
                 .andExpect(jsonPath(jsonPrefix + "id", is(bid.getId().intValue())))
-                .andExpect(jsonPath(jsonPrefix + "buyerId", is(bid.getBuyerId().intValue())))
                 .andExpect(jsonPath(jsonPrefix + "amount", is(bid.getAmount())))
                 .andExpect(jsonPath(jsonPrefix + "_links.self.href", is(BIDS_BASE_PATH + bid.getId())))
-                .andExpect(jsonPath(jsonPrefix + "_links.buyer.href", is(BUYERS_BASE_PATH + bid.getBuyerId())))
-                .andExpect(jsonPath(jsonPrefix + "_links.project.href", is(PROJECTS_BASE_PATH + bid.getProjectId())));
+                .andExpect(jsonPath(jsonPrefix + "_links.buyer.href", is(BUYERS_BASE_PATH + bid.getBuyer().getId())))
+                .andExpect(jsonPath(jsonPrefix + "_links.project.href", is(PROJECTS_BASE_PATH + bid.getBuyer().getId())));
     }
 }
